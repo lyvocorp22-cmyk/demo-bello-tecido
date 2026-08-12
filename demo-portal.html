@@ -198,9 +198,9 @@ input,textarea{font:inherit;color:inherit}
 /* ---------- timeline (signature) ---------- */
 .tl{margin:8px 0 4px;position:relative;padding-left:26px}
 .tl::before{
-  content:'';position:absolute;left:6px;top:9px;bottom:12px;width:2px;background:var(--line)
+  content:'';position:absolute;left:6px;top:9px;bottom:19px;width:2px;background:var(--line)
 }
-.tl-fill{position:absolute;left:6px;top:9px;width:2px;background:var(--ink)}
+.tl-fill{position:absolute;left:6px;top:9px;bottom:19px;width:2px;background:var(--ink)}
 .step{position:relative;padding:0 0 17px}
 .dot{
   position:absolute;left:-26px;top:2px;width:14px;height:14px;border-radius:50%;
@@ -288,12 +288,41 @@ input,textarea{font:inherit;color:inherit}
 
 .statbtns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px}
 .statbtns button{
-  padding:11px 6px;border:1px solid var(--line);background:#fff;border-radius:2px;
-  font-size:12px;font-weight:600;letter-spacing:-.01em
+  padding:11px 8px;border:1px solid var(--line);background:#fff;border-radius:2px;
+  font-size:12px;font-weight:600;letter-spacing:-.01em;text-align:left;line-height:1.25
+}
+.statbtns button em{
+  display:block;font-style:normal;font-family:'IBM Plex Mono',monospace;
+  font-size:8.5px;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--muted);font-weight:400;margin-top:4px
 }
 .statbtns button:active{background:var(--paper)}
-.statbtns button.cur{background:var(--ink);color:#fff;border-color:var(--ink)}
-.statbtns button.locked{opacity:.4;font-weight:400}
+
+.agora{
+  display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;
+  background:var(--ink);color:#fff;border-radius:var(--r);
+  padding:13px 15px;margin:4px 0 6px
+}
+.agora-lb{
+  font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.16em;
+  color:rgba(255,255,255,.5)
+}
+.agora-n{
+  font-family:'Archivo',sans-serif;font-weight:700;font-size:16px;letter-spacing:-.01em
+}
+.blingwait{display:flex;flex-direction:column;gap:7px}
+.bw-item{
+  display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted);
+  border:1px dashed var(--line);border-radius:2px;padding:10px 12px;background:#FAFAF8
+}
+.bw-item svg{width:14px;height:14px;stroke:var(--cyan);fill:none;stroke-width:1.8;flex-shrink:0}
+
+.undo{
+  font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.1em;
+  color:var(--muted);border:1px solid var(--line);border-radius:2px;
+  padding:2px 6px;margin-left:8px;vertical-align:1px;font-weight:400
+}
+.undo:active{background:var(--paper)}
 
 .empty{
   text-align:center;padding:44px 20px;color:var(--muted);font-size:13px;
@@ -374,7 +403,7 @@ input,textarea{font:inherit;color:inherit}
 
   <div class="page" id="p-pedidos">
     <div class="ptitle">Meus pedidos</div>
-    <div class="psub">Acompanhe cada etapa da produção</div>
+    <div class="psub">Acompanhe a produção em tempo real</div>
     <div id="ordlist"></div>
   </div>
 
@@ -494,30 +523,57 @@ const PROD=[
 const EU='Confecções Aurora Ltda';
 
 const FLUXO=[
- {n:'Pedido recebido',src:'automático',mail:1},
- {n:'Impressão',src:'painel',mail:1},
- {n:'Estampando',src:'painel',mail:0},
- {n:'Em corte / costura',src:'painel',mail:0},
- {n:'Pedido pronto',src:'painel',mail:1},
- {n:'Expedido',src:'Bling',mail:0},
- {n:'Entregue',src:'Bling',mail:0},
- {n:'Pedido fechado',src:'Bling',mail:0}
+ {n:'Pedido recebido',    src:'automático', mail:1},
+ {n:'Impressão',          src:'painel',     mail:1},
+ {n:'Estampando',         src:'painel',     mail:0},
+ {n:'Em corte / costura', src:'painel',     mail:0},
+ {n:'Pedido pronto',      src:'painel',     mail:1},
+ {n:'Nota fiscal emitida',src:'Bling',      mail:0},
+ {n:'Expedido',           src:'Bling',      mail:0},
+ {n:'Entregue',           src:'Bling',      mail:0},
+ {n:'Pedido fechado',     src:'Bling',      mail:0}
 ];
 
+/* etapas sincronizadas do Bling — o admin não lança na mão */
+const DO_BLING=[5,6,7,8];
+
+/* Cada pedido guarda o HISTÓRICO do que realmente aconteceu.
+   Não existe fluxo fixo: pedidos podem pular etapas
+   (sem corte/costura, retirada em vez de envio, etc.) */
 const PEDIDOS=[
- {num:1042,cli:'Confecções Aurora Ltda',data:'08/08/2026',etapa:2,total:1842.00,
+ {num:1042,cli:'Confecções Aurora Ltda',data:'08/08/2026',total:1842.00,
+  hist:[{s:0,q:'08/08 · 09:12'},{s:1,q:'09/08 · 14:05'},{s:2,q:'11/08 · 08:40'}],
   itens:[{sku:'AUR-1042',nome:'Floral Noturno',q:80,p:12.40,pat:'p1'},
          {sku:'AUR-1051',nome:'Tropical Folhas',q:70,p:11.80,pat:'p3'}],
   nota:'Entregar até dia 20. Dobrar por SKU, favor.'},
- {num:1039,cli:'Confecções Aurora Ltda',data:'24/07/2026',etapa:6,total:967.50,
-  itens:[{sku:'AUR-1043',nome:'Geométrico Azul',q:65,p:14.90,pat:'p2'}],nota:''},
- {num:1036,cli:'Confecções Aurora Ltda',data:'09/07/2026',etapa:7,total:2310.00,
-  itens:[{sku:'AUR-1055',nome:'Ondas Coral',q:175,p:13.20,pat:'p4'}],nota:''},
- {num:1041,cli:'Malharia Vitória ME',data:'07/08/2026',etapa:0,total:1104.00,
-  itens:[{sku:'VIT-0310',nome:'Listras Marinho',q:80,p:13.80,pat:'p2'}],nota:'Primeiro pedido do mês.'},
- {num:1040,cli:'Uniformes Sul Ltda',data:'05/08/2026',etapa:3,total:3288.00,
+
+ {num:1039,cli:'Confecções Aurora Ltda',data:'24/07/2026',total:967.50,
+  hist:[{s:0,q:'24/07 · 10:30'},{s:1,q:'25/07 · 08:15'},{s:2,q:'26/07 · 16:20'},
+        {s:4,q:'28/07 · 11:00'},{s:5,q:'29/07 · 09:10'},{s:6,q:'29/07 · 15:40'},
+        {s:7,q:'31/07 · 10:05'}],
+  itens:[{sku:'AUR-1043',nome:'Geométrico Azul',q:65,p:14.90,pat:'p2'}],
+  nota:'Sem costura — vai em rolo.'},
+
+ {num:1036,cli:'Confecções Aurora Ltda',data:'09/07/2026',total:2310.00,
+  hist:[{s:0,q:'09/07 · 08:00'},{s:1,q:'10/07 · 09:30'},{s:2,q:'11/07 · 14:10'},
+        {s:3,q:'14/07 · 10:45'},{s:4,q:'16/07 · 17:00'},{s:5,q:'17/07 · 08:30'},
+        {s:7,q:'18/07 · 09:20'},{s:8,q:'25/07 · 11:35'}],
+  itens:[{sku:'AUR-1055',nome:'Ondas Coral',q:175,p:13.20,pat:'p4'}],
+  nota:'Retirada no balcão.'},
+
+ {num:1041,cli:'Malharia Vitória ME',data:'07/08/2026',total:1104.00,
+  hist:[{s:0,q:'07/08 · 16:22'}],
+  itens:[{sku:'VIT-0310',nome:'Listras Marinho',q:80,p:13.80,pat:'p2'}],
+  nota:'Primeiro pedido do mês.'},
+
+ {num:1040,cli:'Uniformes Sul Ltda',data:'05/08/2026',total:3288.00,
+  hist:[{s:0,q:'05/08 · 11:10'},{s:1,q:'06/08 · 08:25'},{s:2,q:'07/08 · 13:50'},
+        {s:3,q:'10/08 · 09:15'}],
   itens:[{sku:'SUL-0088',nome:'Camuflado Cinza',q:240,p:13.70,pat:'p7'}],nota:''}
 ];
+
+/* etapa atual = último lançamento do histórico */
+const atual=p=>p.hist[p.hist.length-1].s;
 
 const CLIENTES=[
  {n:'Confecções Aurora Ltda',cnpj:'12.345.678/0001-90',art:6,ped:3},
@@ -700,23 +756,23 @@ function enviar(){
 function bad(e){
   if(e===0)return'<span class="badge b-rec">Recebido</span>';
   if(e<=4)return'<span class="badge b-prod">'+FLUXO[e].n+'</span>';
-  if(e<=6)return'<span class="badge b-ok">'+FLUXO[e].n+'</span>';
+  if(e<=7)return'<span class="badge b-ok">'+FLUXO[e].n+'</span>';
   return'<span class="badge b-fim">Fechado</span>';
 }
 
 function drawOrd(){
   document.getElementById('ordlist').innerHTML=PEDIDOS
-    .filter(p=>p.cli.startsWith('Confecções'))
+    .filter(p=>p.cli===EU)
     .map(p=>`<button class="order" onclick="verPedido=${p.num};go('p-detalhe')">
       <div class="order-top"><span class="onum">#${p.num}</span><span class="odate">${p.data}</span></div>
-      <div class="order-bot"><div>${bad(p.etapa)}</div><span class="oval">R$ ${brl(p.total)}</span></div>
+      <div class="order-bot"><div>${bad(atual(p))}</div><span class="oval">R$ ${brl(p.total)}</span></div>
     </button>`).join('');
 
   document.getElementById('aordlist').innerHTML=PEDIDOS
     .map(p=>`<button class="order" onclick="verPedido=${p.num};go('a-detalhe')">
       <div class="order-top"><span class="onum">#${p.num}</span><span class="odate">${p.data}</span></div>
       <div class="ocli">${p.cli}</div>
-      <div class="order-bot"><div>${bad(p.etapa)}</div><span class="oval">R$ ${brl(p.total)}</span></div>
+      <div class="order-bot"><div>${bad(atual(p))}</div><span class="oval">R$ ${brl(p.total)}</span></div>
     </button>`).join('');
 
   document.getElementById('clilist').innerHTML=CLIENTES.map(c=>`
@@ -728,15 +784,21 @@ function drawOrd(){
     </div>`).join('');
 }
 
-function timeline(etapa){
-  const alt=(100/8)*(etapa+0.15);
-  return `<div class="tl"><div class="tl-fill" style="height:${alt}%"></div>`+
-   FLUXO.map((s,i)=>{
-     const cl=i<etapa?'past':(i===etapa?'now':'');
-     const dt=i<=etapa?`<div class="step-meta">0${i+2}/08 · 1${i}:2${i} <span class="step-src">${s.src}</span></div>`:'';
-     const ml=(s.mail&&i<=etapa)?'<div class="mailtag">e-mail enviado</div>':'';
-     return `<div class="step ${cl}"><div class="dot"></div>
-       <div class="step-name">${s.n}</div>${dt}${ml}</div>`;
+/* Linha do tempo: mostra só o que aconteceu de verdade.
+   O cliente nunca vê etapas futuras nem a origem da atualização. */
+function timeline(p,admin){
+  const ult=p.hist.length-1;
+  return `<div class="tl"><div class="tl-fill" style="height:calc(100% - 20px)"></div>`+
+   p.hist.map((h,i)=>{
+     const s=FLUXO[h.s], agora=i===ult;
+     const src=admin?` <span class="step-src">${s.src}</span>`:'';
+     const ml=(admin&&s.mail)?'<div class="mailtag">e-mail enviado</div>':'';
+     const del=(admin&&agora&&p.hist.length>1&&!DO_BLING.includes(h.s))
+       ? `<button class="undo" onclick="event.stopPropagation();desfazer(${p.num})">desfazer</button>`:'';
+     return `<div class="step ${agora?'now':'past'}"><div class="dot"></div>
+       <div class="step-name">${s.n}${del}</div>
+       <div class="step-meta">${h.q}${src}</div>
+       ${ml}</div>`;
    }).join('')+'</div>';
 }
 
@@ -750,10 +812,16 @@ function itensHTML(p){
 
 function drawDet(){
   const p=PEDIDOS.find(x=>x.num===verPedido)||PEDIDOS[0];
+  const e=atual(p);
   document.getElementById('detbody').innerHTML=`
     <div class="ptitle">Pedido #${p.num}</div>
     <div class="psub">Enviado em ${p.data}</div>
-    ${timeline(p.etapa)}
+    <div class="agora">
+      <span class="agora-lb">ETAPA ATUAL</span>
+      <span class="agora-n">${FLUXO[e].n}</span>
+    </div>
+    <div class="eyebrow">Andamento</div>
+    ${timeline(p,false)}
     <div class="eyebrow">Itens</div>
     ${itensHTML(p)}
     ${p.nota?`<div class="eyebrow">Suas notas</div><div class="box" style="font-size:13px">${p.nota}</div>`:''}
@@ -762,7 +830,12 @@ function drawDet(){
 
 function drawADet(){
   const p=PEDIDOS.find(x=>x.num===verPedido)||PEDIDOS[0];
-  const manuais=[1,2,3,4];
+  const e=atual(p);
+  const usados=p.hist.map(h=>h.s);
+
+  const manuais  = FLUXO.map((f,i)=>i).filter(i=>i>e&&!usados.includes(i)&&!DO_BLING.includes(i));
+  const pendBling= FLUXO.map((f,i)=>i).filter(i=>i>e&&!usados.includes(i)&& DO_BLING.includes(i));
+
   document.getElementById('adetbody').innerHTML=`
     <div class="ptitle">Pedido #${p.num}</div>
     <div class="psub">${p.cli} · ${p.data}</div>
@@ -771,31 +844,62 @@ function drawADet(){
       <h4>Bling</h4>
       <div class="kv"><span>Pedido de venda</span><strong class="mono">#BL-${8800+p.num}</strong></div>
       <div class="kv"><span>Sincronização</span><span class="badge b-ok">Enviado</span></div>
-      <div class="kv"><span>Baixa financeira</span><strong style="color:var(--muted)">${p.etapa>=7?'12/08/2026':'aguardando'}</strong></div>
+      <div class="kv"><span>Nota fiscal</span><strong style="color:var(--muted)">${usados.includes(5)?'emitida':'aguardando'}</strong></div>
+      <div class="kv"><span>Baixa financeira</span><strong style="color:var(--muted)">${usados.includes(8)?'12/08/2026':'aguardando'}</strong></div>
     </div>
 
-    <div class="eyebrow">Avançar status</div>
-    <div class="statbtns">
-      ${manuais.map(i=>`<button class="${i===p.etapa?'cur':''}"
-        onclick="avancar(${p.num},${i})">${FLUXO[i].n}</button>`).join('')}
+    <div class="agora">
+      <span class="agora-lb">ETAPA ATUAL</span>
+      <span class="agora-n">${FLUXO[e].n}</span>
     </div>
-    <div class="statbtns" style="margin-top:8px">
-      ${[5,6,7].map(i=>`<button class="locked" onclick="toast('Este status vem do Bling.')">${FLUXO[i].n} 🔒</button>`).join('')}
-    </div>
-    <p style="font-size:11px;color:var(--muted);margin-top:9px;line-height:1.5">
-      Expedido, Entregue e Pedido fechado chegam do Bling. Fechado só depois da baixa financeira.</p>
 
-    ${timeline(p.etapa)}
+    <div class="eyebrow">Lançar próxima etapa</div>
+    ${manuais.length
+      ? `<p style="font-size:11.5px;color:var(--muted);margin-bottom:10px;line-height:1.5">
+           Pule o que não se aplica. Um pedido sem costura vai direto de Estampando para Pedido pronto.</p>
+         <div class="statbtns">
+           ${manuais.map(i=>`<button onclick="lancar(${p.num},${i})">
+             ${FLUXO[i].n}<em>${FLUXO[i].mail?'dispara e-mail':'sem e-mail'}</em>
+           </button>`).join('')}
+         </div>`
+      : `<div class="empty" style="padding:22px;font-size:12.5px">Nenhuma etapa manual pendente.</div>`}
+
+    ${pendBling.length?`
+      <div class="eyebrow">Aguardando o Bling</div>
+      <div class="blingwait">
+        ${pendBling.map(i=>`<div class="bw-item">
+          <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6v6l4 2"/><circle cx="12" cy="12" r="9"/></svg>
+          ${FLUXO[i].n}
+        </div>`).join('')}
+      </div>
+      <p style="font-size:11.5px;color:var(--muted);margin-top:9px;line-height:1.5">
+        Chegam sozinhas quando você emitir a nota, despachar ou dar baixa no Bling.</p>`:''}
+
+    <div class="eyebrow">Andamento</div>
+    ${timeline(p,true)}
+
     <div class="eyebrow">Itens</div>
     ${itensHTML(p)}
     ${p.nota?`<div class="eyebrow">Notas do cliente</div><div class="box" style="font-size:13px">${p.nota}</div>`:''}
     <div class="total"><span>TOTAL</span><strong>R$ ${brl(p.total)}</strong></div>`;
 }
 
-function avancar(num,i){
+function lancar(num,i){
   const p=PEDIDOS.find(x=>x.num===num);
-  p.etapa=i;drawADet();drawOrd();
-  toast(FLUXO[i].mail?'Status atualizado · e-mail disparado':'Status atualizado · sem e-mail');
+  const d=new Date();
+  const dd=String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0');
+  const hh=String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+  p.hist.push({s:i,q:dd+' · '+hh});
+  drawADet();drawOrd();
+  toast(FLUXO[i].mail?FLUXO[i].n+' · e-mail disparado':FLUXO[i].n+' · sem e-mail');
+}
+
+function desfazer(num){
+  const p=PEDIDOS.find(x=>x.num===num);
+  if(p.hist.length<2)return;
+  const r=p.hist.pop();
+  drawADet();drawOrd();
+  toast('"'+FLUXO[r.s].n+'" removido do histórico');
 }
 
 /* ---------------- copiar ---------------- */
