@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Bello Tecido — Demo do Portal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#131A2E;
+  --ink-soft:#2B3450;
+  --paper:#F2F1ED;
+  --card:#FFFFFF;
+  --line:#DDDCD5;
+  --muted:#6E6E68;
+  --dye:#C4267B;
+  --cyan:#1E7F8C;
+  --amber:#B07D14;
+  --green:#2E7D4F;
+  --r:4px;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%}
+body{
+  font-family:'IBM Plex Sans',system-ui,sans-serif;
+  background:var(--ink);
+  color:var(--ink);
+  line-height:1.5;
+  font-size:15px;
+}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
+input,textarea{font:inherit;color:inherit}
+
+/* ---------- shell ---------- */
+.shell{max-width:520px;margin:0 auto;background:var(--paper);min-height:100vh;position:relative;overflow-x:hidden}
+
+.demobar{
+  background:var(--ink);color:#fff;padding:10px 14px 12px;
+  position:sticky;top:0;z-index:60;
+}
+.demobar-top{display:flex;align-items:center;gap:8px;margin-bottom:9px}
+.demotag{
+  font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.16em;
+  border:1px solid rgba(255,255,255,.35);padding:2px 6px;border-radius:2px;
+  color:rgba(255,255,255,.7)
+}
+.demobar-top span{font-size:11px;color:rgba(255,255,255,.55);letter-spacing:.02em}
+.toggle{display:flex;background:rgba(255,255,255,.08);border-radius:3px;padding:3px;gap:3px}
+.toggle button{
+  flex:1;padding:8px 4px;font-size:12px;font-weight:600;letter-spacing:.04em;
+  color:rgba(255,255,255,.55);border-radius:2px;transition:.15s
+}
+.toggle button.on{background:#fff;color:var(--ink)}
+
+/* ---------- app header ---------- */
+.apphead{
+  padding:16px 18px 14px;border-bottom:1px solid var(--line);
+  display:flex;justify-content:space-between;align-items:flex-start;gap:12px;
+  background:var(--paper)
+}
+.brand{font-family:'Archivo',sans-serif;font-weight:800;font-size:17px;letter-spacing:-.02em}
+.brand em{font-style:normal;color:var(--dye)}
+.who{font-size:11px;color:var(--muted);margin-top:2px}
+.whoami{
+  font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.12em;
+  padding:4px 7px;border-radius:2px;white-space:nowrap;flex-shrink:0
+}
+.whoami.cli{background:#E6EDEE;color:var(--cyan)}
+.whoami.adm{background:var(--ink);color:#fff}
+
+/* ---------- pages ---------- */
+.page{display:none;padding:18px 18px 100px}
+.page.on{display:block}
+.ptitle{
+  font-family:'Archivo',sans-serif;font-weight:700;font-size:22px;
+  letter-spacing:-.02em;margin-bottom:3px
+}
+.psub{font-size:12.5px;color:var(--muted);margin-bottom:20px}
+
+.eyebrow{
+  font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.16em;
+  color:var(--muted);text-transform:uppercase;margin:26px 0 10px;
+  display:flex;align-items:center;gap:9px
+}
+.eyebrow::after{content:'';flex:1;height:1px;background:var(--line)}
+
+/* ---------- swatch cards ---------- */
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.swatch{
+  background:var(--card);border:1px solid var(--line);border-radius:var(--r);
+  overflow:hidden;display:flex;flex-direction:column
+}
+.swatch.off{opacity:.55}
+.art{height:104px;position:relative}
+.art::after{
+  content:'';position:absolute;inset:0;
+  box-shadow:inset 0 -14px 20px -14px rgba(0,0,0,.25)
+}
+.p1{background:radial-gradient(circle at 30% 30%,#E8A0C4 0 14%,transparent 15%),radial-gradient(circle at 72% 68%,#8D4F9E 0 11%,transparent 12%),#2B1B3D;background-size:34px 34px,26px 26px,100% 100%}
+.p2{background:repeating-linear-gradient(48deg,#1E4F8C 0 9px,#2E6FB8 9px 18px,#0F2E52 18px 27px)}
+.p3{background:radial-gradient(ellipse at 20% 80%,#3E8E5A 0 22%,transparent 23%),radial-gradient(ellipse at 78% 24%,#75C08A 0 17%,transparent 18%),#13361F;background-size:40px 40px,30px 30px,100% 100%}
+.p4{background:repeating-radial-gradient(circle at 50% 120%,#F07B5E 0 12px,#D9503A 12px 24px,#F5A98D 24px 36px)}
+.p5{background:repeating-linear-gradient(0deg,#3A3A38 0 6px,transparent 6px 20px),repeating-linear-gradient(90deg,#3A3A38 0 6px,transparent 6px 20px),#D8D3C4}
+.p6{background:radial-gradient(circle,#B8B2A2 0 2.5px,transparent 3px),#F0EDE4;background-size:13px 13px}
+.p7{background:repeating-linear-gradient(135deg,#C4267B 0 5px,#7A1550 5px 11px,#1B0A14 11px 20px)}
+
+.sinfo{padding:10px 11px 11px;flex:1;display:flex;flex-direction:column}
+.sku{
+  font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:500;
+  color:var(--dye);letter-spacing:.05em
+}
+.sname{font-weight:600;font-size:13.5px;line-height:1.25;margin:3px 0 6px;letter-spacing:-.01em}
+.chip{
+  display:inline-block;font-size:9.5px;letter-spacing:.05em;color:var(--muted);
+  border:1px solid var(--line);border-radius:2px;padding:2px 5px;margin-bottom:9px;
+  align-self:flex-start
+}
+.price{
+  font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:14px;
+  margin-top:auto;margin-bottom:9px
+}
+.price small{font-size:9.5px;color:var(--muted);font-weight:400}
+
+.qty{display:flex;border:1px solid var(--line);border-radius:2px;overflow:hidden;margin-bottom:7px}
+.qty button{width:30px;height:31px;font-size:15px;color:var(--muted);background:#FAFAF8}
+.qty button:active{background:var(--line)}
+.qty input{
+  flex:1;width:100%;text-align:center;border:none;outline:none;background:#fff;
+  font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:500;min-width:0
+}
+.add{
+  width:100%;padding:9px;background:var(--ink);color:#fff;border-radius:2px;
+  font-size:11.5px;font-weight:600;letter-spacing:.06em
+}
+.add:active{background:var(--ink-soft)}
+.add.done{background:var(--green)}
+.inactive-tag{
+  width:100%;padding:9px;background:#EEEDE7;color:var(--muted);border-radius:2px;
+  font-size:10.5px;font-weight:600;letter-spacing:.06em;text-align:center
+}
+
+/* ---------- cart ---------- */
+.line{
+  display:flex;gap:11px;padding:13px 0;border-bottom:1px solid var(--line);align-items:center
+}
+.line-sw{width:42px;height:42px;border-radius:2px;flex-shrink:0}
+.line-mid{flex:1;min-width:0}
+.line-mid .sku{font-size:9.5px}
+.line-mid strong{display:block;font-size:13px;font-weight:600;letter-spacing:-.01em}
+.line-mid span{font-size:11px;color:var(--muted)}
+.line-val{font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:600;text-align:right}
+.line-val small{display:block;font-size:9.5px;color:var(--muted);font-weight:400}
+
+.notes{
+  width:100%;border:1px solid var(--line);border-radius:2px;padding:11px;
+  font-size:13px;min-height:74px;resize:vertical;background:#fff;outline:none
+}
+.notes:focus{border-color:var(--ink)}
+
+.total{
+  display:flex;justify-content:space-between;align-items:baseline;
+  padding:16px 0;border-top:2px solid var(--ink);margin-top:6px
+}
+.total span{font-family:'Archivo',sans-serif;font-weight:700;font-size:13px;letter-spacing:.02em}
+.total strong{font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:22px}
+
+.cta{
+  width:100%;padding:15px;background:var(--dye);color:#fff;border-radius:2px;
+  font-family:'Archivo',sans-serif;font-weight:700;font-size:13.5px;letter-spacing:.06em
+}
+.cta:active{filter:brightness(.9)}
+.cta.ghost{background:none;color:var(--ink);border:1px solid var(--ink)}
+.cta.dark{background:var(--ink)}
+
+/* ---------- order rows ---------- */
+.order{
+  background:var(--card);border:1px solid var(--line);border-radius:var(--r);
+  padding:13px 14px;margin-bottom:10px;display:block;width:100%;text-align:left
+}
+.order-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px}
+.onum{font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:14px}
+.odate{font-size:11px;color:var(--muted)}
+.order-bot{display:flex;justify-content:space-between;align-items:flex-end;gap:10px}
+.ocli{font-size:12px;color:var(--muted);margin-bottom:5px}
+.oval{font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:14px;white-space:nowrap}
+
+.badge{
+  display:inline-block;font-size:10px;font-weight:600;letter-spacing:.04em;
+  padding:3px 8px;border-radius:2px;white-space:nowrap
+}
+.b-rec{background:#E6EDEE;color:var(--cyan)}
+.b-prod{background:#FBF0D9;color:var(--amber)}
+.b-ok{background:#E3F0E8;color:var(--green)}
+.b-fim{background:#EAE9E3;color:var(--muted)}
+
+/* ---------- timeline (signature) ---------- */
+.tl{margin:8px 0 4px;position:relative;padding-left:26px}
+.tl::before{
+  content:'';position:absolute;left:6px;top:9px;bottom:12px;width:2px;background:var(--line)
+}
+.tl-fill{position:absolute;left:6px;top:9px;width:2px;background:var(--ink)}
+.step{position:relative;padding:0 0 17px}
+.dot{
+  position:absolute;left:-26px;top:2px;width:14px;height:14px;border-radius:50%;
+  background:var(--paper);border:2px solid var(--line);z-index:2
+}
+.step.past .dot{background:var(--ink);border-color:var(--ink)}
+.step.now .dot{
+  background:var(--dye);border-color:var(--dye);
+  box-shadow:0 0 0 4px rgba(196,38,123,.16)
+}
+.step-name{font-size:13.5px;font-weight:600;letter-spacing:-.01em;color:var(--muted)}
+.step.past .step-name,.step.now .step-name{color:var(--ink)}
+.step.now .step-name{color:var(--dye)}
+.step-meta{
+  font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:var(--muted);
+  letter-spacing:.05em;margin-top:2px
+}
+.step-src{
+  font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);
+  border:1px solid var(--line);padding:1px 5px;border-radius:2px;margin-left:6px
+}
+.mailtag{
+  display:inline-block;font-size:9px;letter-spacing:.06em;color:var(--dye);
+  background:#FBE9F2;padding:1px 6px;border-radius:2px;margin-top:4px
+}
+
+/* ---------- generic box ---------- */
+.box{
+  background:var(--card);border:1px solid var(--line);border-radius:var(--r);
+  padding:14px;margin-bottom:11px
+}
+.box h4{
+  font-family:'Archivo',sans-serif;font-size:13px;font-weight:700;
+  letter-spacing:-.01em;margin-bottom:9px
+}
+.kv{display:flex;justify-content:space-between;gap:12px;padding:5px 0;font-size:13px}
+.kv span{color:var(--muted);flex-shrink:0}
+.kv strong{font-weight:500;text-align:right}
+.mono{font-family:'IBM Plex Mono',monospace;font-size:12px}
+
+.warn{
+  background:#FBF0D9;border-left:3px solid var(--amber);padding:11px 13px;
+  font-size:12px;line-height:1.5;margin-bottom:13px;border-radius:0 2px 2px 0
+}
+.warn b{display:block;margin-bottom:3px;font-size:11px;letter-spacing:.03em}
+
+.clirow{
+  width:100%;display:flex;align-items:center;gap:12px;text-align:left;
+  background:var(--card);border:1px solid var(--line);border-radius:var(--r);
+  padding:15px 14px;margin-bottom:10px
+}
+.clirow:active{background:#FAFAF8}
+.clirow-main{flex:1;min-width:0}
+.clirow-nome{
+  font-family:'Archivo',sans-serif;font-weight:700;font-size:14.5px;
+  letter-spacing:-.01em;margin-bottom:5px
+}
+.clirow-meta{
+  display:flex;align-items:center;gap:7px;flex-wrap:wrap;
+  font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;
+  color:var(--muted);text-transform:uppercase
+}
+.clirow-meta .alerta{color:var(--amber)}
+.dotsep{width:3px;height:3px;border-radius:50%;background:var(--line)}
+.chev{width:17px;height:17px;stroke:var(--line);fill:none;stroke-width:2;flex-shrink:0}
+
+.mailcopy{
+  display:inline-flex;align-items:center;gap:5px;font-family:'IBM Plex Mono',monospace;
+  font-size:11.5px;font-weight:600;color:var(--ink);background:#fff;
+  border:1px solid var(--amber);border-radius:2px;padding:3px 7px;margin:1px 0
+}
+.mailcopy svg{width:12px;height:12px;stroke:var(--amber);fill:none;stroke-width:2}
+.mailcopy:active{background:#FDF6E3}
+
+.field{margin-bottom:14px}
+.field label{
+  display:block;font-family:'IBM Plex Mono',monospace;font-size:9.5px;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:6px
+}
+.field input,.field textarea{
+  width:100%;border:1px solid var(--line);border-radius:2px;padding:11px;
+  font-size:13.5px;background:#fff;outline:none
+}
+.field input:focus,.field textarea:focus{border-color:var(--ink)}
+
+.statbtns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px}
+.statbtns button{
+  padding:11px 6px;border:1px solid var(--line);background:#fff;border-radius:2px;
+  font-size:12px;font-weight:600;letter-spacing:-.01em
+}
+.statbtns button:active{background:var(--paper)}
+.statbtns button.cur{background:var(--ink);color:#fff;border-color:var(--ink)}
+.statbtns button.locked{opacity:.4;font-weight:400}
+
+.empty{
+  text-align:center;padding:44px 20px;color:var(--muted);font-size:13px;
+  border:1px dashed var(--line);border-radius:var(--r)
+}
+
+/* ---------- nav ---------- */
+.nav{
+  position:fixed;bottom:0;left:50%;transform:translateX(-50%);
+  width:100%;max-width:520px;background:#fff;border-top:1px solid var(--line);
+  display:flex;z-index:50;padding-bottom:env(safe-area-inset-bottom)
+}
+.nav button{
+  flex:1;padding:10px 2px 12px;display:flex;flex-direction:column;
+  align-items:center;gap:4px;color:var(--muted);font-size:9.5px;
+  letter-spacing:.03em;font-weight:500
+}
+.nav button.on{color:var(--dye)}
+.nav svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:1.7}
+.navbadge{
+  position:absolute;top:6px;margin-left:19px;background:var(--dye);color:#fff;
+  font-family:'IBM Plex Mono',monospace;font-size:8.5px;font-weight:600;
+  min-width:15px;height:15px;border-radius:8px;display:flex;
+  align-items:center;justify-content:center;padding:0 4px
+}
+
+/* ---------- toast ---------- */
+.toast{
+  position:fixed;bottom:78px;left:50%;transform:translateX(-50%) translateY(70px);
+  background:var(--ink);color:#fff;padding:11px 18px;border-radius:3px;
+  font-size:12.5px;font-weight:500;z-index:80;opacity:0;transition:.25s;
+  white-space:nowrap;max-width:90vw
+}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+
+.back{
+  font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.1em;
+  color:var(--muted);margin-bottom:14px;display:flex;align-items:center;gap:5px
+}
+
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <div class="demobar">
+    <div class="demobar-top">
+      <span class="demotag">DEMO</span>
+      <span>dados fictícios · toque para navegar</span>
+    </div>
+    <div class="toggle">
+      <button id="tCli" class="on" onclick="setP('cli')">Visão do cliente</button>
+      <button id="tAdm" onclick="setP('adm')">Visão do admin</button>
+    </div>
+  </div>
+
+  <div class="apphead">
+    <div>
+      <div class="brand">Bello<em>.</em>Tecido</div>
+      <div class="who" id="who">Confecções Aurora Ltda</div>
+    </div>
+    <div class="whoami cli" id="whoami">CLIENTE</div>
+  </div>
+
+  <!-- ============ CLIENTE ============ -->
+  <div class="page on" id="p-catalogo">
+    <div class="ptitle">Seu catálogo</div>
+    <div class="psub">5 artes liberadas · quantidade de 5 em 5</div>
+    <div class="grid" id="catgrid"></div>
+  </div>
+
+  <div class="page" id="p-carrinho">
+    <div class="ptitle">Carrinho</div>
+    <div class="psub">Confira antes de enviar</div>
+    <div id="cartbody"></div>
+  </div>
+
+  <div class="page" id="p-pedidos">
+    <div class="ptitle">Meus pedidos</div>
+    <div class="psub">Acompanhe cada etapa da produção</div>
+    <div id="ordlist"></div>
+  </div>
+
+  <div class="page" id="p-detalhe">
+    <div class="back">← PEDIDOS</div>
+    <div id="detbody"></div>
+  </div>
+
+  <div class="page" id="p-artes">
+    <div class="ptitle">Envio de artes</div>
+    <div class="psub">Mande o link da pasta. Cadastramos e liberamos no seu catálogo.</div>
+
+    <div class="warn">
+      <b>1 · COMPARTILHE A PASTA</b>
+      Dê acesso à pasta para <button class="mailcopy" onclick="copiar('bellotecido@gmail.com')">bellotecido@gmail.com <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 012-2h10"/></svg></button> com permissão de leitura, ou libere o link para download sem pedir autorização.
+    </div>
+
+    <div class="warn">
+      <b>2 · NOMEIE PELO SKU</b>
+      Cada arquivo salvo com o nome igual ao SKU do produto — por exemplo <span class="mono">AUR-1042.png</span>. Arquivos fora desse padrão voltam para reenvio.
+    </div>
+
+    <div class="field">
+      <label>Link da pasta compartilhada</label>
+      <input type="url" placeholder="https://drive.google.com/drive/folders/...">
+    </div>
+    <div class="field">
+      <label>Observações (opcional)</label>
+      <textarea rows="3" placeholder="Nome das artes, tecido pretendido, instruções"></textarea>
+    </div>
+    <button class="cta" onclick="toast('Link enviado. A equipe foi notificada.')">ENVIAR LINK</button>
+
+    <div class="eyebrow">Envios anteriores</div>
+    <div class="box">
+      <div class="kv"><span>28/07/2026</span><span class="badge b-ok">Cadastrado</span></div>
+      <div class="kv"><span class="mono" style="font-size:11px">6 artes · Drive</span><strong style="color:var(--muted);font-size:11px">SKU AUR-1055 a 1060</strong></div>
+    </div>
+    <div class="box">
+      <div class="kv"><span>02/08/2026</span><span class="badge b-prod">Em análise</span></div>
+      <div class="kv"><span class="mono" style="font-size:11px">3 artes · Dropbox</span><strong style="color:var(--muted);font-size:11px">recebido há 2 dias</strong></div>
+    </div>
+  </div>
+
+  <!-- ============ ADMIN ============ -->
+  <div class="page" id="a-pedidos">
+    <div class="ptitle">Pedidos</div>
+    <div class="psub">Todos os clientes · 3 em produção</div>
+    <div id="aordlist"></div>
+  </div>
+
+  <div class="page" id="a-detalhe">
+    <div class="back">← PEDIDOS</div>
+    <div id="adetbody"></div>
+  </div>
+
+  <div class="page" id="a-clientes">
+    <div class="ptitle">Clientes</div>
+    <div class="psub">3 ativos</div>
+    <div id="clilist"></div>
+    <button class="cta dark" style="margin-top:14px" onclick="toast('Abriria o formulário de cadastro.')">+ CADASTRAR CLIENTE</button>
+  </div>
+
+  <div class="page" id="a-catalogo">
+    <div class="ptitle">Catálogos</div>
+    <div class="psub">Toque no cliente para ver e editar as artes dele</div>
+    <div class="grid" id="acatgrid"></div>
+  </div>
+
+  <div class="page" id="a-catdet">
+    <div id="acatdet"></div>
+  </div>
+
+  <div class="page" id="a-artes">
+    <div class="ptitle">Artes recebidas</div>
+    <div class="psub">1 envio aguardando cadastro</div>
+    <div class="box">
+      <div class="kv"><span>Confecções Aurora</span><span class="badge b-prod">Em análise</span></div>
+      <div style="font-size:12px;margin:9px 0 4px;word-break:break-all;color:var(--cyan)" class="mono">dropbox.com/scl/fo/8x2k…/artes-agosto</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:11px">"3 artes novas, todas em malha fria. A do coral é prioridade."</div>
+      <button class="cta dark" style="padding:11px;font-size:12px" onclick="toast('Abriria o cadastro das artes no catálogo.')">CADASTRAR NO CATÁLOGO</button>
+    </div>
+    <div class="eyebrow">Processados</div>
+    <div class="box">
+      <div class="kv"><span>Confecções Aurora</span><span class="badge b-ok">Cadastrado</span></div>
+      <div class="kv"><span class="mono" style="font-size:11px">28/07 · 6 artes</span><strong style="font-size:11px;color:var(--muted)">AUR-1055 a 1060</strong></div>
+    </div>
+    <div class="box">
+      <div class="kv"><span>Malharia Vitória</span><span class="badge b-ok">Cadastrado</span></div>
+      <div class="kv"><span class="mono" style="font-size:11px">21/07 · 2 artes</span><strong style="font-size:11px;color:var(--muted)">VIT-0310, VIT-0311</strong></div>
+    </div>
+  </div>
+
+  <div class="nav" id="nav"></div>
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+/* ---------------- dados fictícios ---------------- */
+const PROD=[
+ {cli:'Confecções Aurora Ltda',sku:'AUR-1042',nome:'Floral Noturno',tec:'Malha PV',preco:12.40,pat:'p1',ativo:1},
+ {cli:'Confecções Aurora Ltda',sku:'AUR-1043',nome:'Geométrico Azul',tec:'Dry Fit',preco:14.90,pat:'p2',ativo:1},
+ {cli:'Confecções Aurora Ltda',sku:'AUR-1051',nome:'Tropical Folhas',tec:'Malha Fria',preco:11.80,pat:'p3',ativo:1},
+ {cli:'Confecções Aurora Ltda',sku:'AUR-1055',nome:'Ondas Coral',tec:'Poliéster 100%',preco:13.20,pat:'p4',ativo:1},
+ {cli:'Confecções Aurora Ltda',sku:'AUR-1060',nome:'Xadrez Mini',tec:'Tactel',preco:15.50,pat:'p5',ativo:1},
+ {cli:'Confecções Aurora Ltda',sku:'AUR-1061',nome:'Pontilhado Off',tec:'Malha PV',preco:10.90,pat:'p6',ativo:0},
+
+ {cli:'Malharia Vitória ME',sku:'VIT-0310',nome:'Listras Marinho',tec:'Dry Fit',preco:13.80,pat:'p2',ativo:1},
+ {cli:'Malharia Vitória ME',sku:'VIT-0311',nome:'Micro Poá',tec:'Malha Fria',preco:11.20,pat:'p6',ativo:1},
+
+ {cli:'Uniformes Sul Ltda',sku:'SUL-0088',nome:'Camuflado Cinza',tec:'Tactel',preco:13.70,pat:'p7',ativo:1},
+ {cli:'Uniformes Sul Ltda',sku:'SUL-0090',nome:'Grafite Sólido',tec:'Poliéster 100%',preco:12.60,pat:'p5',ativo:1},
+ {cli:'Uniformes Sul Ltda',sku:'SUL-0093',nome:'Diagonal Verde',tec:'Malha PV',preco:14.10,pat:'p3',ativo:1},
+ {cli:'Uniformes Sul Ltda',sku:'SUL-0095',nome:'Bloco Coral',tec:'Dry Fit',preco:15.90,pat:'p4',ativo:0}
+];
+
+/* cliente logado na demo */
+const EU='Confecções Aurora Ltda';
+
+const FLUXO=[
+ {n:'Pedido recebido',src:'automático',mail:1},
+ {n:'Impressão',src:'painel',mail:1},
+ {n:'Estampando',src:'painel',mail:0},
+ {n:'Em corte / costura',src:'painel',mail:0},
+ {n:'Pedido pronto',src:'painel',mail:1},
+ {n:'Expedido',src:'Bling',mail:0},
+ {n:'Entregue',src:'Bling',mail:0},
+ {n:'Pedido fechado',src:'Bling',mail:0}
+];
+
+const PEDIDOS=[
+ {num:1042,cli:'Confecções Aurora Ltda',data:'08/08/2026',etapa:2,total:1842.00,
+  itens:[{sku:'AUR-1042',nome:'Floral Noturno',q:80,p:12.40,pat:'p1'},
+         {sku:'AUR-1051',nome:'Tropical Folhas',q:70,p:11.80,pat:'p3'}],
+  nota:'Entregar até dia 20. Dobrar por SKU, favor.'},
+ {num:1039,cli:'Confecções Aurora Ltda',data:'24/07/2026',etapa:6,total:967.50,
+  itens:[{sku:'AUR-1043',nome:'Geométrico Azul',q:65,p:14.90,pat:'p2'}],nota:''},
+ {num:1036,cli:'Confecções Aurora Ltda',data:'09/07/2026',etapa:7,total:2310.00,
+  itens:[{sku:'AUR-1055',nome:'Ondas Coral',q:175,p:13.20,pat:'p4'}],nota:''},
+ {num:1041,cli:'Malharia Vitória ME',data:'07/08/2026',etapa:0,total:1104.00,
+  itens:[{sku:'VIT-0310',nome:'Listras Marinho',q:80,p:13.80,pat:'p2'}],nota:'Primeiro pedido do mês.'},
+ {num:1040,cli:'Uniformes Sul Ltda',data:'05/08/2026',etapa:3,total:3288.00,
+  itens:[{sku:'SUL-0088',nome:'Camuflado Cinza',q:240,p:13.70,pat:'p7'}],nota:''}
+];
+
+const CLIENTES=[
+ {n:'Confecções Aurora Ltda',cnpj:'12.345.678/0001-90',art:6,ped:3},
+ {n:'Malharia Vitória ME',cnpj:'98.765.432/0001-21',art:2,ped:1},
+ {n:'Uniformes Sul Ltda',cnpj:'45.678.901/0001-55',art:4,ped:1}
+];
+
+/* ---------------- estado ---------------- */
+let persona='cli', pagina='p-catalogo', carrinho={}, verPedido=1042;
+const brl=v=>v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+
+/* ---------------- navegação ---------------- */
+const NAVS={
+ cli:[['p-catalogo','Catálogo','M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z'],
+      ['p-carrinho','Carrinho','M6 6h15l-2 9H8zM6 6L5 3H2M9 20a1 1 0 100 2 1 1 0 000-2M18 20a1 1 0 100 2 1 1 0 000-2'],
+      ['p-pedidos','Pedidos','M9 3h6v4H9zM5 7h14v14H5zM9 12h6M9 16h4'],
+      ['p-artes','Artes','M12 16V4M12 4L7 9M12 4l5 5M4 17v3h16v-3']],
+ adm:[['a-pedidos','Pedidos','M9 3h6v4H9zM5 7h14v14H5zM9 12h6M9 16h4'],
+      ['a-clientes','Clientes','M16 20v-2a4 4 0 00-8 0v2M12 11a3.5 3.5 0 100-7 3.5 3.5 0 000 7'],
+      ['a-catalogo','Catálogo','M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z'],
+      ['a-artes','Artes','M12 4v12M12 16l-5-5M12 16l5-5M4 17v3h16v-3']]
+};
+
+function drawNav(){
+  const qt=Object.values(carrinho).reduce((a,b)=>a+b,0);
+  document.getElementById('nav').innerHTML=NAVS[persona].map(([id,lb,d])=>{
+    const bd=(id==='p-carrinho'&&qt)?`<span class="navbadge">${qt}</span>`:'';
+    const at = pagina===id || (id==='a-catalogo'&&pagina==='a-catdet')
+             || (id==='p-pedidos'&&pagina==='p-detalhe')
+             || (id==='a-pedidos'&&pagina==='a-detalhe');
+    return `<button class="${at?'on':''}" onclick="go('${id}')">${bd}
+      <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="${d}"/></svg>${lb}</button>`;
+  }).join('');
+}
+
+function go(id){
+  pagina=id;
+  document.querySelectorAll('.page').forEach(p=>p.classList.toggle('on',p.id===id));
+  if(id==='p-carrinho')drawCart();
+  if(id==='p-detalhe')drawDet();
+  if(id==='a-detalhe')drawADet();
+  drawNav();
+  window.scrollTo(0,0);
+}
+
+function setP(p){
+  persona=p;
+  document.getElementById('tCli').classList.toggle('on',p==='cli');
+  document.getElementById('tAdm').classList.toggle('on',p==='adm');
+  const w=document.getElementById('whoami');
+  w.textContent=p==='cli'?'CLIENTE':'ADMIN';
+  w.className='whoami '+(p==='cli'?'cli':'adm');
+  document.getElementById('who').textContent=p==='cli'?'Confecções Aurora Ltda':'Painel interno · Ricardo';
+  go(p==='cli'?'p-catalogo':'a-pedidos');
+}
+
+/* ---------------- catálogo ---------------- */
+function cardHTML(p,admin){
+  return `
+   <div class="swatch ${p.ativo?'':'off'}">
+     <div class="art ${p.pat}"></div>
+     <div class="sinfo">
+       <div class="sku">${p.sku}</div>
+       <div class="sname">${p.nome}</div>
+       <span class="chip">${p.tec}</span>
+       <div class="price">R$ ${brl(p.preco)} <small>/un</small></div>
+       ${admin
+        ? (p.ativo
+           ? `<button class="add" onclick="toast('Abriria a edição de ${p.sku}.')">EDITAR</button>`
+           : `<button class="add" style="background:var(--green)" onclick="toast('${p.sku} ficaria visível para o cliente.')">ATIVAR</button>`)
+        : `<div class="qty">
+             <button onclick="chg('${p.sku}',-5)">−</button>
+             <input type="number" id="q-${p.sku}" value="${carrinho[p.sku]||0}" min="0" step="5" onchange="setQ('${p.sku}',this.value)">
+             <button onclick="chg('${p.sku}',5)">+</button>
+           </div>
+           <button class="add" id="b-${p.sku}" onclick="addC('${p.sku}')">ADICIONAR</button>`}
+     </div>
+   </div>`;
+}
+
+/* catálogo do cliente: só as artes dele, só as ativas */
+function drawCat(){
+  const meus=PROD.filter(p=>p.cli===EU&&p.ativo);
+  document.getElementById('catgrid').innerHTML=meus.map(p=>cardHTML(p,false)).join('');
+}
+
+/* admin: lista de clientes com resumo do catálogo */
+function drawACat(){
+  const grupos=[...new Set(PROD.map(p=>p.cli))];
+  document.getElementById('acatgrid').innerHTML=grupos.map(g=>{
+    const itens=PROD.filter(p=>p.cli===g);
+    const at=itens.filter(p=>p.ativo).length;
+    const inat=itens.length-at;
+    return `<button class="clirow" onclick="abrirCat('${g}')">
+      <div class="clirow-main">
+        <div class="clirow-nome">${g}</div>
+        <div class="clirow-meta">
+          <span>${itens.length} artes</span>
+          <span class="dotsep"></span>
+          <span>${at} ativas</span>
+          ${inat?`<span class="dotsep"></span><span class="alerta">${inat} inativa${inat>1?'s':''}</span>`:''}
+        </div>
+      </div>
+      <svg class="chev" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>
+    </button>`;
+  }).join('');
+}
+
+/* admin: catálogo de um cliente específico */
+let catCliente='';
+function abrirCat(g){
+  catCliente=g;
+  const itens=PROD.filter(p=>p.cli===g);
+  const inat=itens.filter(p=>!p.ativo).length;
+  document.getElementById('acatdet').innerHTML=`
+    <div class="back" onclick="go('a-catalogo')">← CLIENTES</div>
+    <div class="ptitle">${g}</div>
+    <div class="psub">${itens.length} artes${inat?` · ${inat} aguardando ativação`:''}</div>
+    <button class="cta ghost" style="margin-bottom:18px;padding:11px;font-size:12px"
+      onclick="toast('Adicionaria arte ao catálogo de ${g}.')">+ ADICIONAR ARTE</button>
+    <div class="grid">${itens.map(p=>cardHTML(p,true)).join('')}</div>`;
+  go('a-catdet');
+}
+
+function chg(sku,d){
+  const i=document.getElementById('q-'+sku);
+  i.value=Math.max(0,(+i.value||0)+d);
+}
+function setQ(sku,v){
+  document.getElementById('q-'+sku).value=Math.max(0,+v||0);
+}
+function addC(sku){
+  const q=+document.getElementById('q-'+sku).value||0;
+  if(!q)return toast('Informe a quantidade primeiro.');
+  carrinho[sku]=q;
+  const b=document.getElementById('b-'+sku);
+  b.textContent='NO CARRINHO';b.classList.add('done');
+  setTimeout(()=>{b.textContent='ADICIONAR';b.classList.remove('done')},1400);
+  drawNav();toast(q+' un de '+sku+' no carrinho');
+}
+
+/* ---------------- carrinho ---------------- */
+function drawCart(){
+  const ks=Object.keys(carrinho).filter(k=>carrinho[k]>0);
+  const el=document.getElementById('cartbody');
+  if(!ks.length){
+    el.innerHTML='<div class="empty">Carrinho vazio.<br>Volte ao catálogo e escolha as artes.</div>';
+    return;
+  }
+  let tot=0;
+  const linhas=ks.map(k=>{
+    const p=PROD.find(x=>x.sku===k),s=p.preco*carrinho[k];tot+=s;
+    return `<div class="line">
+      <div class="line-sw ${p.pat}"></div>
+      <div class="line-mid">
+        <div class="sku">${p.sku}</div>
+        <strong>${p.nome}</strong>
+        <span>${carrinho[k]} un × R$ ${brl(p.preco)}</span>
+      </div>
+      <div class="line-val">R$ ${brl(s)}<small>${p.tec}</small></div>
+    </div>`;
+  }).join('');
+  el.innerHTML=linhas+`
+    <div class="eyebrow">Notas do pedido</div>
+    <textarea class="notes" placeholder="Prazo, forma de dobra, instruções de entrega"></textarea>
+    <div class="total"><span>TOTAL DO PEDIDO</span><strong>R$ ${brl(tot)}</strong></div>
+    <button class="cta" onclick="enviar()">ENVIAR PEDIDO</button>
+    <p style="font-size:11px;color:var(--muted);text-align:center;margin-top:11px;line-height:1.5">
+      O pedido entra no Bling como pedido de venda<br>e você recebe a confirmação por e-mail.</p>`;
+}
+
+function enviar(){
+  carrinho={};
+  toast('Pedido #1043 enviado. Confirmação a caminho.');
+  setTimeout(()=>go('p-pedidos'),900);
+  drawNav();
+}
+
+/* ---------------- pedidos ---------------- */
+function bad(e){
+  if(e===0)return'<span class="badge b-rec">Recebido</span>';
+  if(e<=4)return'<span class="badge b-prod">'+FLUXO[e].n+'</span>';
+  if(e<=6)return'<span class="badge b-ok">'+FLUXO[e].n+'</span>';
+  return'<span class="badge b-fim">Fechado</span>';
+}
+
+function drawOrd(){
+  document.getElementById('ordlist').innerHTML=PEDIDOS
+    .filter(p=>p.cli.startsWith('Confecções'))
+    .map(p=>`<button class="order" onclick="verPedido=${p.num};go('p-detalhe')">
+      <div class="order-top"><span class="onum">#${p.num}</span><span class="odate">${p.data}</span></div>
+      <div class="order-bot"><div>${bad(p.etapa)}</div><span class="oval">R$ ${brl(p.total)}</span></div>
+    </button>`).join('');
+
+  document.getElementById('aordlist').innerHTML=PEDIDOS
+    .map(p=>`<button class="order" onclick="verPedido=${p.num};go('a-detalhe')">
+      <div class="order-top"><span class="onum">#${p.num}</span><span class="odate">${p.data}</span></div>
+      <div class="ocli">${p.cli}</div>
+      <div class="order-bot"><div>${bad(p.etapa)}</div><span class="oval">R$ ${brl(p.total)}</span></div>
+    </button>`).join('');
+
+  document.getElementById('clilist').innerHTML=CLIENTES.map(c=>`
+    <div class="box">
+      <h4>${c.n}</h4>
+      <div class="kv"><span>CNPJ</span><strong class="mono">${c.cnpj}</strong></div>
+      <div class="kv"><span>Artes no catálogo</span><strong>${c.art}</strong></div>
+      <div class="kv"><span>Pedidos</span><strong>${c.ped}</strong></div>
+    </div>`).join('');
+}
+
+function timeline(etapa){
+  const alt=(100/8)*(etapa+0.15);
+  return `<div class="tl"><div class="tl-fill" style="height:${alt}%"></div>`+
+   FLUXO.map((s,i)=>{
+     const cl=i<etapa?'past':(i===etapa?'now':'');
+     const dt=i<=etapa?`<div class="step-meta">0${i+2}/08 · 1${i}:2${i} <span class="step-src">${s.src}</span></div>`:'';
+     const ml=(s.mail&&i<=etapa)?'<div class="mailtag">e-mail enviado</div>':'';
+     return `<div class="step ${cl}"><div class="dot"></div>
+       <div class="step-name">${s.n}</div>${dt}${ml}</div>`;
+   }).join('')+'</div>';
+}
+
+function itensHTML(p){
+  return p.itens.map(i=>`<div class="line">
+    <div class="line-sw ${i.pat}"></div>
+    <div class="line-mid"><div class="sku">${i.sku}</div><strong>${i.nome}</strong>
+      <span>${i.q} un × R$ ${brl(i.p)}</span></div>
+    <div class="line-val">R$ ${brl(i.q*i.p)}</div></div>`).join('');
+}
+
+function drawDet(){
+  const p=PEDIDOS.find(x=>x.num===verPedido)||PEDIDOS[0];
+  document.getElementById('detbody').innerHTML=`
+    <div class="ptitle">Pedido #${p.num}</div>
+    <div class="psub">Enviado em ${p.data}</div>
+    ${timeline(p.etapa)}
+    <div class="eyebrow">Itens</div>
+    ${itensHTML(p)}
+    ${p.nota?`<div class="eyebrow">Suas notas</div><div class="box" style="font-size:13px">${p.nota}</div>`:''}
+    <div class="total"><span>TOTAL</span><strong>R$ ${brl(p.total)}</strong></div>`;
+}
+
+function drawADet(){
+  const p=PEDIDOS.find(x=>x.num===verPedido)||PEDIDOS[0];
+  const manuais=[1,2,3,4];
+  document.getElementById('adetbody').innerHTML=`
+    <div class="ptitle">Pedido #${p.num}</div>
+    <div class="psub">${p.cli} · ${p.data}</div>
+
+    <div class="box">
+      <h4>Bling</h4>
+      <div class="kv"><span>Pedido de venda</span><strong class="mono">#BL-${8800+p.num}</strong></div>
+      <div class="kv"><span>Sincronização</span><span class="badge b-ok">Enviado</span></div>
+      <div class="kv"><span>Baixa financeira</span><strong style="color:var(--muted)">${p.etapa>=7?'12/08/2026':'aguardando'}</strong></div>
+    </div>
+
+    <div class="eyebrow">Avançar status</div>
+    <div class="statbtns">
+      ${manuais.map(i=>`<button class="${i===p.etapa?'cur':''}"
+        onclick="avancar(${p.num},${i})">${FLUXO[i].n}</button>`).join('')}
+    </div>
+    <div class="statbtns" style="margin-top:8px">
+      ${[5,6,7].map(i=>`<button class="locked" onclick="toast('Este status vem do Bling.')">${FLUXO[i].n} 🔒</button>`).join('')}
+    </div>
+    <p style="font-size:11px;color:var(--muted);margin-top:9px;line-height:1.5">
+      Expedido, Entregue e Pedido fechado chegam do Bling. Fechado só depois da baixa financeira.</p>
+
+    ${timeline(p.etapa)}
+    <div class="eyebrow">Itens</div>
+    ${itensHTML(p)}
+    ${p.nota?`<div class="eyebrow">Notas do cliente</div><div class="box" style="font-size:13px">${p.nota}</div>`:''}
+    <div class="total"><span>TOTAL</span><strong>R$ ${brl(p.total)}</strong></div>`;
+}
+
+function avancar(num,i){
+  const p=PEDIDOS.find(x=>x.num===num);
+  p.etapa=i;drawADet();drawOrd();
+  toast(FLUXO[i].mail?'Status atualizado · e-mail disparado':'Status atualizado · sem e-mail');
+}
+
+/* ---------------- copiar ---------------- */
+function copiar(txt){
+  if(navigator.clipboard){
+    navigator.clipboard.writeText(txt).then(
+      ()=>toast('E-mail copiado: '+txt),
+      ()=>toast(txt)
+    );
+  } else { toast(txt); }
+}
+
+/* ---------------- toast ---------------- */
+let tt;
+function toast(m){
+  const t=document.getElementById('toast');
+  t.textContent=m;t.classList.add('on');
+  clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('on'),2200);
+}
+
+/* ---------------- init ---------------- */
+drawCat();
+drawACat();
+drawOrd();
+drawNav();
+document.querySelectorAll('.back').forEach(b=>{
+  b.style.cursor='pointer';
+  b.onclick=()=>go(persona==='cli'?'p-pedidos':'a-pedidos');
+});
+</script>
+</body>
+</html>
